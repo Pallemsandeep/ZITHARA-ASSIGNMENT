@@ -1,0 +1,66 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+const App = () => {
+  const [data, setData] = useState([]);
+  const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('created_at');
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    fetchData();
+  }, [search, sortBy, page]);
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`/api/data?page=${page}&search=${search}&sortBy=${sortBy}`);
+      setData(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <div>
+      <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by Name or Location" />
+      <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+        <option value="date">Sort by Date</option>
+        <option value="time">Sort by Time</option>
+      </select>
+      <table>
+        {/* Table Header */}
+        <thead>
+          <tr>
+            <th>Customer Name</th>
+            <th>Age</th>
+            <th>Phone</th>
+            <th>Location</th>
+            <th>Date</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        {/* Table Body */}
+        <tbody>
+          {data.map((item) => (
+            <tr key={item.sno}>
+              <td>{item.customer_name}</td>
+              <td>{item.age}</td>
+              <td>{item.phone}</td>
+              <td>{item.location}</td>
+              <td>{item.date}</td>
+              <td>{item.time}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {/* Pagination */}
+      <div>
+        <button onClick={() => setPage(page - 1)} disabled={page === 1}>Previous</button>
+        <span>{page}</span>
+        <button onClick={() => setPage(page + 1)}>Next</button>
+      </div>
+    </div>
+  );
+};
+
+export default App;
